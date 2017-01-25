@@ -27,19 +27,20 @@ const {
   IPC_ITEM_DETAILS_RESPONSE,
   IPC_LOAD_THEME,
 } = require('../ipc');
-const { MAX_RESULTS, CORE_PLUGIN_PATH, DEBOUNCE_TIME } = require('../constants');
+const {
+  MAX_RESULTS,
+  CORE_PLUGIN_PATH,
+  DEBOUNCE_TIME,
+  WINDOW_MIN_HEIGHT,
+  WINDOW_MAX_HEIGHT,
+} = require('../constants');
 const Config = require('../../utils/conf');
 const CacheConf = require('../../utils/CacheConf');
 const { debounce, hasOwnProp, getOwnProp } = require('../../utils/helpers');
+const window = require('./windows/window');
 
 const { PLUGIN_PATH } = utils.paths;
 const { app, BrowserWindow, Tray, Menu, nativeImage, clipboard, globalShortcut, ipcMain } = electron;
-
-// set default window values
-const WINDOW_DEFAULT_WIDTH = 700;
-const WINDOW_DEFAULT_HEIGHT = 80;
-const WINDOW_MIN_HEIGHT = 80;
-const WINDOW_MAX_HEIGHT = 710; // results + query + padding
 
 let win = null;
 let tray = null;
@@ -307,35 +308,6 @@ const debounceHandleItemDetailsRequest = debounce(handleItemDetailsRequest, DEBO
 
 const debounceHandleCopyItemToClipboard = debounce(handleCopyItemToClipboard, DEBOUNCE_TIME);
 
-/**
- * Creates a new Browser window and loads the renderer index.
- *
- * @param {Object} theme
- * @return {BrowserWindow}
- */
-const createWindow = (theme) => {
-  const opts = {
-    width: WINDOW_DEFAULT_WIDTH,
-    height: WINDOW_DEFAULT_HEIGHT,
-    maxHeight: WINDOW_MAX_HEIGHT,
-    center: false,
-    frame: false,
-    show: false,
-    minimizable: false,
-    maximizable: false,
-    hasShadow: true,
-    skipTaskbar: true,
-    transparent: true,
-  };
-
-  // sets the background color
-  if (theme && theme.window.backgroundColor) {
-    opts.backgroundColor = theme.window.backgroundColor;
-  }
-
-  return new BrowserWindow(opts);
-};
-
 // create the Context Menu for the Tray
 const contextMenu = Menu.buildFromTemplate([
   { label: 'Toggle Dext', type: 'normal', click: () => { toggleMainWindow(); } },
@@ -358,7 +330,7 @@ const onAppReady = () => {
   // loads the theme
   const t = config.get('theme') || '';
   loadTheme(t).then((theme) => {
-    win = createWindow(theme);
+    win = window(theme).getInstance();
 
     repositionWindow();
 
