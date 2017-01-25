@@ -332,8 +332,8 @@ const onAppReady = () => {
   // loads the theme
   const t = config.get('theme') || '';
   loadTheme(t).then((theme) => {
-    const factory = IS_DEV ? developmentWindowFactory() : windowFactory();
-    win = factory.getInstance();
+    const { getDefaultOptions, getInstance } = IS_DEV ? developmentWindowFactory() : windowFactory();
+    win = getInstance(getDefaultOptions());
 
     repositionWindow();
 

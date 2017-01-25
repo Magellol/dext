@@ -33,9 +33,7 @@ module.exports = function windowFactory(theme) {
         transparent: true,
       };
     },
-    getInstance() {
-      const options = this.getDefaultOptions();
-
+    getInstance(options = {}) {
       windowInstance = windowInstance || createWindow(options);
       return windowInstance;
     },
