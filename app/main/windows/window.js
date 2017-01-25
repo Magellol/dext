@@ -6,36 +6,37 @@ const {
   WINDOW_MAX_HEIGHT,
 } = require('../../constants');
 
-module.exports = function window(theme) {
-  function getDefaultOptions() {
-    return {
-      width: WINDOW_DEFAULT_WIDTH,
-      height: WINDOW_DEFAULT_HEIGHT,
-      maxHeight: WINDOW_MAX_HEIGHT,
-      center: false,
-      frame: false,
-      show: false,
-      minimizable: false,
-      maximizable: false,
-      hasShadow: true,
-      skipTaskbar: true,
-      transparent: true,
-    };
-  }
+module.exports = function windowFactory(theme) {
+  let windowInstance = null;
 
-  function createWindow() {
-    const options = Object.assign({}, getDefaultOptions(), {
+  function createWindow(options) {
+    const allOptions = Object.assign({}, options, {
       backgroundColor: (theme && theme.window.backgroundColor) ? theme.window.backgroundColor : '#FFF',
     });
 
-    return new BrowserWindow(options);
+    return new BrowserWindow(allOptions);
   }
 
-  let windowInstance = null;
-
   return {
+    getDefaultOptions() {
+      return {
+        width: WINDOW_DEFAULT_WIDTH,
+        height: WINDOW_DEFAULT_HEIGHT,
+        maxHeight: WINDOW_MAX_HEIGHT,
+        center: false,
+        frame: false,
+        show: false,
+        minimizable: false,
+        maximizable: false,
+        hasShadow: true,
+        skipTaskbar: true,
+        transparent: true,
+      };
+    },
     getInstance() {
-      windowInstance = windowInstance || createWindow();
+      const options = this.getDefaultOptions();
+
+      windowInstance = windowInstance || createWindow(options);
       return windowInstance;
     },
   };

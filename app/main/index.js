@@ -33,11 +33,13 @@ const {
   DEBOUNCE_TIME,
   WINDOW_MIN_HEIGHT,
   WINDOW_MAX_HEIGHT,
+  IS_DEV,
 } = require('../constants');
 const Config = require('../../utils/conf');
 const CacheConf = require('../../utils/CacheConf');
 const { debounce, hasOwnProp, getOwnProp } = require('../../utils/helpers');
-const window = require('./windows/window');
+const developmentWindowFactory = require('./windows/developmentWindow');
+const windowFactory = require('./windows/window');
 
 const { PLUGIN_PATH } = utils.paths;
 const { app, BrowserWindow, Tray, Menu, nativeImage, clipboard, globalShortcut, ipcMain } = electron;
@@ -330,7 +332,8 @@ const onAppReady = () => {
   // loads the theme
   const t = config.get('theme') || '';
   loadTheme(t).then((theme) => {
-    win = window(theme).getInstance();
+    const factory = IS_DEV ? developmentWindowFactory() : windowFactory();
+    win = factory.getInstance();
 
     repositionWindow();
 
